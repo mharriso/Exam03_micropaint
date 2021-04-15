@@ -24,6 +24,13 @@ typedef struct s_rectangle
 
 }			t_rectangle;
 
+void free_matrix(t_matrix *matrix)
+{
+	for(int i = 0; i < matrix->height; i++)
+		free(matrix->array[i]);
+	free(matrix->array);
+}
+
 int	get_background(FILE *file, t_matrix *matrix)
 {
 	if(fscanf(file, "%d %d %c\n", &matrix->width, &matrix->height, &matrix->color) == 3)
@@ -31,11 +38,11 @@ int	get_background(FILE *file, t_matrix *matrix)
 		if(matrix->width < 1 || matrix->width > 300 || matrix->height < 1 || matrix->height > 300)
 			return 1;
 		if(!(matrix->array = malloc(matrix->height * sizeof(char *))))
-			return 2;
+			return 1;
 		for(int y = 0; y < matrix->height; y++)
 		{
 			if(!(matrix->array[y] = malloc(matrix->width)))
-				return 2;
+				return 1;
 			for(int x = 0; x < matrix->width; x++)
 				matrix->array[y][x] = matrix->color;
 		}
@@ -110,6 +117,7 @@ int	micropaint(FILE *file)
 	if(get_rectangles(file, &matrix))
 		return 1;
 	print_result(&matrix);
+	free_matrix(&matrix);
 	return 0;
 }
 
